@@ -41,27 +41,47 @@ public class MouseMove : MonoBehaviour
 					//Debug.DrawLine(ray.origin, hit.point);
 				} else if (hit.collider.tag == "Hero")
 				{
-					GameObject gameObject;
-					gameObject = (GameObject)Instantiate(Resources.Load<GameObject>("Link"),CenterOfVectors(new Vector3[] {this.transform.position,hit.transform.position}),Quaternion.LookRotation(this.transform.position,hit.transform.position));
-					gameObject.transform.localScale += new Vector3(0,0,Vector3.Distance(this.transform.position,hit.transform.position));
+					string linkName = "Link_" + this.name + "_" + hit.collider.name;
+
+					GameObject link;
+
+					link = GameObject.Find(linkName);
+
+					if (link!=null)
+					{
+						Destroy(link);
+						return;
+					}
+
+					link = (GameObject)Instantiate(Resources.Load<GameObject>("Link"), CenterOfVectors(new Vector3[]
+					{
+						this.transform.position,
+						hit.transform.position
+					}), Quaternion.LookRotation(hit.transform.position - this.transform.position));
+					link.transform.localScale = new Vector3(link.transform.localScale.x, link.transform.localScale.y, Vector3.Distance(this.transform.position, hit.transform.position));
+
+					link.GetComponent<KeepLink>().TransformA = this.transform;
+					link.GetComponent<KeepLink>().TransformB = hit.transform;
+
+					link.name = linkName;
 				}
 			}
 			isSelected = false;
 		}
 	}
 					      
-	public Vector3 CenterOfVectors( Vector3[] vectors )
+	public Vector3 CenterOfVectors(Vector3[] vectors)
 	{
-	Vector3 sum = Vector3.zero;
-	if( vectors == null || vectors.Length == 0 )
-	{
-	return sum;
-	}
+		Vector3 sum = Vector3.zero;
+		if (vectors == null || vectors.Length == 0)
+		{
+			return sum;
+		}
 
-	foreach( Vector3 vec in vectors )
-	{
-	sum += vec;
-	}
-	return sum/vectors.Length;
+		foreach (Vector3 vec in vectors)
+		{
+			sum += vec;
+		}
+		return sum / vectors.Length;
 	}
 }
